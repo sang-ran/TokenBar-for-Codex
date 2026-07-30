@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: swift test
+
+      - name: Package Apple Silicon app
+        run: |
+          TOKENBAR_ARCH=arm64 Scripts/package.sh release \
+            ".build/dist/TokenBar for Codex.app"
+          /usr/bin/ditto -c -k --sequesterRsrc --keepParent \
+            ".build/dist/TokenBar for Codex.app" \
+            ".build/dist/TokenBar-for-Codex.zip"
+          shasum -a 256 ".build/dist/TokenBar-for-Codex.zip" \
+            > ".build/dist/TokenBar-for-Codex.zip.sha256"
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: TokenBar-for-Codex-arm64
+          path: |
+            .build/dist/TokenBar-for-Codex.zip
+            .build/dist/TokenBar-for-Codex.zip.sha256
