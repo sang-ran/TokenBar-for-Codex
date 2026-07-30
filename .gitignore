@@ -1,0 +1,8 @@
+.build/
+DerivedData/
+.DS_Store
+*.app
+*.zip
+*.xcuserstate
+xcuserdata/
+Resources/TokenBar.iconset/
