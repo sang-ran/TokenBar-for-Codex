@@ -13,7 +13,7 @@ jobs:
   test-and-build:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Run tests
         run: swift test
@@ -22,14 +22,12 @@ jobs:
         run: |
           TOKENBAR_ARCH=arm64 Scripts/package.sh release \
             ".build/dist/TokenBar for Codex.app"
-          /usr/bin/ditto -c -k --sequesterRsrc --keepParent \
+          Scripts/create_archive.sh \
             ".build/dist/TokenBar for Codex.app" \
             ".build/dist/TokenBar-for-Codex.zip"
-          shasum -a 256 ".build/dist/TokenBar-for-Codex.zip" \
-            > ".build/dist/TokenBar-for-Codex.zip.sha256"
 
       - name: Upload build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: TokenBar-for-Codex-arm64
           path: |
