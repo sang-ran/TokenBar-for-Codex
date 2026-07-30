@@ -61,7 +61,7 @@ content is not sent to the developer. See [PRIVACY.md](PRIVACY.md) for details.
 
 ## Build from source
 
-Swift 6.2 or later is recommended.
+Swift 5.10 or later is required.
 
 ```bash
 swift test
