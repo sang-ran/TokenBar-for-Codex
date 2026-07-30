@@ -7,6 +7,14 @@ struct TokenCounts: Decodable, Equatable, Sendable {
     let reasoningOutput: Int
     let total: Int
 
+    init(input: Int, cachedInput: Int, output: Int, reasoningOutput: Int, total: Int) {
+        self.input = max(0, input)
+        self.cachedInput = max(0, cachedInput)
+        self.output = max(0, output)
+        self.reasoningOutput = max(0, reasoningOutput)
+        self.total = max(0, total)
+    }
+
     enum CodingKeys: String, CodingKey {
         case input = "input_tokens"
         case cachedInput = "cached_input_tokens"
@@ -17,11 +25,12 @@ struct TokenCounts: Decodable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.input = max(0, try values.decodeIfPresent(Int.self, forKey: .input) ?? 0)
-        self.cachedInput = max(0, try values.decodeIfPresent(Int.self, forKey: .cachedInput) ?? 0)
-        self.output = max(0, try values.decodeIfPresent(Int.self, forKey: .output) ?? 0)
-        self.reasoningOutput = max(0, try values.decodeIfPresent(Int.self, forKey: .reasoningOutput) ?? 0)
-        self.total = max(0, try values.decodeIfPresent(Int.self, forKey: .total) ?? 0)
+        self.init(
+            input: try values.decodeIfPresent(Int.self, forKey: .input) ?? 0,
+            cachedInput: try values.decodeIfPresent(Int.self, forKey: .cachedInput) ?? 0,
+            output: try values.decodeIfPresent(Int.self, forKey: .output) ?? 0,
+            reasoningOutput: try values.decodeIfPresent(Int.self, forKey: .reasoningOutput) ?? 0,
+            total: try values.decodeIfPresent(Int.self, forKey: .total) ?? 0)
     }
 
     var uncachedInput: Int {

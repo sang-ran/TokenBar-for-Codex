@@ -6,7 +6,12 @@ enum TokenBarApplication {
     static func main() {
         let application = NSApplication.shared
         let delegate = AppDelegate()
+        #if DEBUG
+        let isQAPreview = CommandLine.arguments.contains("--qa-window")
+        application.setActivationPolicy(isQAPreview ? .regular : .accessory)
+        #else
         application.setActivationPolicy(.accessory)
+        #endif
         application.delegate = delegate
         application.run()
         withExtendedLifetime(delegate) {}
@@ -28,11 +33,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.settings = settings
         self.model = model
         self.statusBarController = StatusBarController(model: model, settings: settings)
-        model.start()
 
         #if DEBUG
-        if CommandLine.arguments.contains("--qa-window") {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self, weak model] in
+        let isQAPreview = CommandLine.arguments.contains("--qa-window")
+        if isQAPreview {
+            model.loadQAPreviewData()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self, weak model] in
                 guard let self, let model else { return }
                 let controller = TokenPopoverViewController(
                     model: model,
@@ -46,15 +52,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     controller?.update()
                 }
                 let window = NSWindow(contentViewController: controller)
-                window.title = "TokenBar AppKit 预览"
-                window.styleMask = [.titled, .closable]
+                window.title = "TokenBar for Codex"
+                window.styleMask = [.titled, .closable, .miniaturizable]
                 window.setContentSize(controller.preferredContentSize)
                 window.center()
                 window.makeKeyAndOrderFront(nil)
                 NSApp.activate(ignoringOtherApps: true)
                 self.previewWindow = window
             }
+        } else {
+            model.start()
         }
+        #else
+        model.start()
         #endif
     }
 

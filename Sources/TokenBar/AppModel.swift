@@ -70,6 +70,37 @@ final class AppModel {
         }
     }
 
+    #if DEBUG
+    func loadQAPreviewData(now: Date = Date()) {
+        self.lastSuccessfulTokenPollAt = now
+        self.tokenSnapshot = LiveTokenSnapshot(
+            threadID: "qa-preview",
+            model: "gpt-5.6-sol",
+            recordedAt: now,
+            current: TokenCounts(
+                input: 39_840,
+                cachedInput: 31_200,
+                output: 2_840,
+                reasoningOutput: 1_120,
+                total: 42_680))
+        self.quotaState = .available(QuotaSnapshot(
+            windows: [
+                QuotaWindow(
+                    kind: .session,
+                    usedPercent: 28,
+                    windowMinutes: 300,
+                    resetsAt: now.addingTimeInterval(2 * 60 * 60 + 18 * 60)),
+                QuotaWindow(
+                    kind: .weekly,
+                    usedPercent: 16,
+                    windowMinutes: 10_080,
+                    resetsAt: now.addingTimeInterval(4 * 24 * 60 * 60 + 7 * 60 * 60)),
+            ],
+            fetchedAt: now))
+        self.tokenError = nil
+    }
+    #endif
+
     var activityText: String {
         guard self.tokenSnapshot != nil else {
             return self.tokenError ?? "等待任务"
@@ -81,6 +112,11 @@ final class AppModel {
     }
 
     var isActivelyUpdating: Bool {
+        #if DEBUG
+        if self.tokenSnapshot?.threadID == "qa-preview" {
+            return true
+        }
+        #endif
         guard let lastSuccessfulTokenPollAt else { return false }
         return Date().timeIntervalSince(lastSuccessfulTokenPollAt) < 3
     }

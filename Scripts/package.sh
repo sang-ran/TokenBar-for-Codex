@@ -4,6 +4,7 @@ set -euo pipefail
 CONFIGURATION="${1:-release}"
 DESTINATION="${2:-}"
 ARCHITECTURE="${TOKENBAR_ARCH:-arm64}"
+SIGN_IDENTITY="${TOKENBAR_SIGN_IDENTITY:--}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 case "$CONFIGURATION" in
@@ -32,7 +33,16 @@ fi
 chmod +x "$STAGE/Contents/MacOS/TokenBar"
 
 xattr -cr "$STAGE"
-codesign --force --deep --sign - "$STAGE"
+if [[ "$SIGN_IDENTITY" == "-" ]]; then
+  codesign --force --sign - "$STAGE"
+else
+  codesign \
+    --force \
+    --options runtime \
+    --timestamp \
+    --sign "$SIGN_IDENTITY" \
+    "$STAGE"
+fi
 codesign --verify --deep --strict --verbose=2 "$STAGE"
 file "$STAGE/Contents/MacOS/TokenBar" | grep -q "arm64"
 

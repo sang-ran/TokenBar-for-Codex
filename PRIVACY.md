@@ -19,5 +19,12 @@ TokenBar for Codex is designed to keep its work local.
 - Quota requests are made through the user's installed Codex executable and are
   therefore subject to Codex and OpenAI's own data practices.
 
+## Network activity
+
+TokenBar does not contact a developer-operated server. Subscription quota is
+requested through the locally installed Codex executable; TokenBar itself does
+not add analytics or a separate account service. API-key accounts use
+token-only mode and do not request subscription quota windows.
+
 Uninstalling the app removes the executable. macOS may retain its small
 preference record until it is removed from the user's preferences.

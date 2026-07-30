@@ -1,0 +1,14 @@
+cask "tokenbar-for-codex" do
+  version "__VERSION__"
+  sha256 "__SHA256__"
+
+  url "https://github.com/sang-ran/TokenBar-for-Codex/releases/download/v#{version}/TokenBar-for-Codex-v#{version}.zip"
+  name "TokenBar for Codex"
+  desc "Real-time Codex token usage and quota in the macOS menu bar"
+  homepage "https://github.com/sang-ran/TokenBar-for-Codex"
+
+  depends_on arch: :arm64
+  depends_on macos: ">= :sonoma"
+
+  app "TokenBar for Codex.app"
+end
